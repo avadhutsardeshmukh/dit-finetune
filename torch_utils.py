@@ -30,9 +30,10 @@ def dataloader(image_size, batch_size, part_type):
     #def transform(examples):
         #images = [preprocess(image) for image in examples['image']]
         #return {'images': images}
+        
     #Direct access from hf
-    #dataset = load_dataset("huggan/smithsonian_butterflies_subset", split="train")
-            #DefectSpectrum/Defect_Spectrum")
+    #dataset = load_dataset("DefectSpectrum/Defect_Spectrum", split="train")
+
     #In case the dataset is locally stored
     dataset = datasets.ImageFolder(
             os.path.join('Defect_Spectrum/DS-MVTec',

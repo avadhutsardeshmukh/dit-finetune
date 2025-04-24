@@ -8,18 +8,15 @@ To address this, one promising approach is to augment training data using synthe
 
 ## Possible Solutions
 Conditional image generation is a fundamental problem in computer vision, and has received a lot of attention in recent research. With the rise of models such as generative adversarial networks (GANs) and variational autoencoders (VAEs), deep generative models started showing promise for synthetic image generation. While VAEs model and optimize the data likelihood explicitly, GANs do this implicitly through an adversarial network, leading to sharper images with better perceptual quality. GANs quickly became popular and were adapted for diverse applications (such as generating synthetic speech data and e-commerce visuals). However, GANs are known to be notoriously difficult to train because of the underlying mini-max game. A flurry of research addressed the problems of GAN training stability and other issues such as mode-collapse (e.g. WGAN, WGAN-GP, SpectralNormGAN and so on). Meanwhile, with the advent of better compute and learning architectures, the liklihood (and score)-based modeled regained the attention, resulting in the recent advances in diffusion models. Latest diffusion models such as DDPM, GLIDE, Imagen, ControlNet, and Stable Diffusion 3 are very powerful image generators. While the original DDPM model was unconditional, the follow-up research effectively addressed the problem of conditioning through various ways : 
-
 	- Adding the conditioning information as extra channels in the ResNet blocks
 	- Combining conditioning information with timesteps in diffusion
 	- Using the gradients from a separately trained classifier
 	- Guidance (e.g. Contrastive Language-Image Pretraining Guidance for alignment with text)
 	- Classifier free guidance 
-
 These models have internalized various semantics of different image types through their extensive training on millions (or even billions in some cases, such as SD3) of images with and without labels. They make a very good choice for making a model for few-shot image generation on a new class of images. 
 
 ### Fine-tuning methods
 Some possible ways to fine tune these pre-trained models for our task are :
-
 	- Full fine-tuning
 	The huge parameter space of these models poses a significant challenge in full fine-tuning since the optimizer needs to maintain the state of all the parameters, requiring large GPU memory.
 	- Parameter efficient fine-tuning
@@ -28,7 +25,6 @@ Some possible ways to fine tune these pre-trained models for our task are :
 	This class of methods is particularly suitable for fine-tuning text-conditional models such as stable diffusion. They are based on the idea of creating new "words" in the embedding space which correspond to new concepts. Most notable approaches include Dreambooth[5] and Textual Inversion[6]. 
 	- Distillation
 	These methods train smaller models by leveraging the training signal from the large models, effectively ``distilling'' the knowledge contained in the larger models. 
-
 ## Modeling and Implementation
 ### Modeling Considerations
 ### Diffusion Model
@@ -47,10 +43,10 @@ Adapting from DiffFit, **I selected all the biases and layernorm weights for tun
 Tuning the class embeddings is perhaps the most important thing since the association of the class labels with Imagenet classes must now be changed to reflect the new classes. **I chose those product types for which a similar class label was available in Imagenet** - for example, screw. And I started the class IDs at the index of this label. My hypothesis is that **in this case, the class embeddings can to be tuned relatively easily.**
 ### Choosing Hyperparameters
 
-	- **Batch Size** - I used very small batch sizes (tried 1, 2, 4, and 8) to avoid OOM errors and also because the dataset is quite small. With larger batch sizes, I slightly increased the learning rate. However, smaller batch sizes worked better. In particular, batch size 8 resulted in unstable training. 
-	- **Learning Rate** - I used small learning rate values. I tried `1e-6, 1e-5, 2e-5` and `3e-5`. Of these, training with `1e-5` was more stable. With `3e-5` I got one of the best samples, but the training collapsed after 50 epochs. 
-	- **Gradient Accumulation** - Since the batch sizes were very small, I used  gradient_accumulation_=2. That is, the gradients are accumulated for two steps before applying the weight updates. This gives the benefits of large batches while using small batch sizes. 
-	- **Noise Scheduler Steps** - The number of of noise scheduler steps in inference (the training steps are fixed. I observed that more steps (`>100`) worked better, but only upto an extent (tried 200, 500); `1000` was worse. 
+	- **Batch Size** : I used very small batch sizes (tried 1, 2, 4, and 8) to avoid OOM errors and also because the dataset is quite small. With larger batch sizes, I slightly increased the learning rate. However, smaller batch sizes worked better. In particular, batch size 8 resulted in unstable training. 
+	- **Learning Rate** : I used small learning rate values. I tried `1e-6, 1e-5, 2e-5` and `3e-5`. Of these, training with `1e-5` was more stable. With `3e-5` I got one of the best samples, but the training collapsed after 50 epochs. 
+	- **Gradient Accumulation** : Since the batch sizes were very small, I used  gradient_accumulation_=2. That is, the gradients are accumulated for two steps before applying the weight updates. This gives the benefits of large batches while using small batch sizes. 
+	- **Noise Scheduler Steps** : The number of of noise scheduler steps in inference (the training steps are fixed. I observed that more steps (`>100`) worked better, but only upto an extent (tried 200, 500); `1000` was worse. 
 	- **Mixed Precision Training** for memory efficiency. Torch automatically applies the optimal precision (autocast), such as fp16 or fp32 to each parameter, allowing mixed precision training. 	
 
 ### Data Preprocessing and Augmentation
@@ -72,14 +68,12 @@ The best generated samples for hazelnut and screw are shown below. Columns corre
 
 
 ## Evaluation Metrics
-
 	-  Class-wise FID and Inception score
 	- Improvement in accuracy of the downstream task model with generated data (various metrics of the downstream model such as accuracy, f1, precision, recall, mAP@x
 
 ## Further Scope
 ### Model Improvements
 Given more time, following two things can possibly lead to substantially better generations:
-
 	- The huggingface implementation of DiT hides the hyperparameters such as classifier free guidance in the long class hierarchy. While classifier free guidance scale has been implemented, their DiT class does not implement a "forward_with_cfg" method. Instead, one can work with the original codebase to tune and gain more control over all the hyperparameters
 	- A recent paper DriveDitFit[3] proposed a LoRA fine-tuning method for DiT. They propose to replace the class embeddings with closest Imagenet class-embeddings according to a CLIP similarity between corresponding images. This can be used to get good initialization for the class embeddings. 
 	- Other LoRA approaches of fine-tuning and knowledge distillation.
@@ -96,4 +90,4 @@ The DefectSpectrum dataset also includes segmentation masks that demarcate the d
 [5] Nataniel Ruiz et al. *Dreambooth: Fine-tuning text-to-image diffusion models for subject-driven generation*, 2022.  
 [6] Rinon Gal et al. *An image is worth one word: Personalizing text-to-image generation using textual inversion*, 2022.  
 [7] Lvmin Zhang et al. *Adding conditional control to text-to-image diffusion models*.
-[8] Elad Ben Zaken et al. *BitFit: Simple parameter-ecient ne-tuning for transformer-based masked language models.* ACL 2022.
+[8] Elad Ben Zaken et al. *BitFit: Simple parameter-efficient fine-tuning for transformer-based masked language models.* ACL 2022.

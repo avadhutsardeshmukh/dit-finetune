@@ -66,6 +66,8 @@ First I trained a model with any new config for 10 epochs, to see if it's workin
 
 ### Results
 The best generated samples for hazelnut and screw are shown below. Columns correspond to class labels and rows are different samples.
+![Figure 1: Generated samples of hazelnut](images/hazelnut)
+![Figure 2: Generated samples of screw](images/screw)
 
 ## Evaluation Metrics
 -  Class-wise FID and Inception score

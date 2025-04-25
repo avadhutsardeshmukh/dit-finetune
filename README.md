@@ -1,5 +1,5 @@
-###TLDR; Main Notebook : finetune_dit_param_efficient.ipynb
-# Few-shot generation of images of products with defects by fine-tuning large diffusion models
+### TLDR; Main Notebook : finetune_dit_param_efficient.ipynb
+# Few-shot image generation for defective products by fine-tuning large diffusion models
 **Author:** Avadhut Sardeshmukh
 
 ## Problem Statement

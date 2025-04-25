@@ -1,5 +1,6 @@
 ### TLDR; 
 Main Notebook : finetune_dit_param_efficient.ipynb
+
 Slides : AI_Challenge.pptx
 
 # Few-shot image generation for defective products by fine-tuning large diffusion models

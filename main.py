@@ -8,6 +8,7 @@ def main(args):
     torch.manual_seed(args.random_seed)
     if (args.model == 'DiT'):
         losses = finetuning_dit.finetune_dit(
+                full_fine_tune=False,
                 image_size=args.image_size,
                 part_type=args.part_type, 
                 num_epochs=args.epochs,

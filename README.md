@@ -1,6 +1,6 @@
 ### TLDR; 
-Main Notebook : finetune_dit_param_efficient.ipynb
-
+Main Notebook for diffusion : finetune_dit_param_efficient.ipynb
+Main Notebook for textual inversion : textual_inversion.ipynb
 Slides : AI_Challenge.pptx
 
 # Few-shot image generation for defective products by fine-tuning large diffusion models
